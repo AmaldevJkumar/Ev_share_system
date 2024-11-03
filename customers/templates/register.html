@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Rental System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500&display=swap" rel="stylesheet">
+    {% load static %}
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh; /* Ensures the body takes at least full height */
+        }
+
+        /* Header */
+        header {
+            background-color: #1d3557;
+            color: #f1faee;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: #f1faee;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #a8dadc;
+        }
+
+        /* Centering the login section */
+        .login-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin: auto; /* Center horizontally */
+            width: 400px; /* Set a fixed width for the login section */
+            max-width: 90%; /* Ensure it doesn't exceed the viewport */
+            flex: 1; /* Allow the login section to take available space */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center content vertically within the login section */
+        }
+
+        .role-btn {
+            width: 150px;
+        }
+
+        .role-btn.active {
+            background-color: #007bff;
+            color: white;
+            }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+            width: 100%; /* Make it responsive */
+    }
+
+.mb-3 {
+    margin-bottom: 1rem; /* Spacing between fields */
+}
+
+.text-danger {
+    color: red; /* Style for error messages */
+}
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 1em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header Section -->
+    <header>
+        <div class="container">
+            <h1>Electric Vehicle Hub</h1>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#vehicles">Vehicles</a></li>
+                    <li><a href="#location">Location</a></li>
+                    <li><a href="{% url 'login_page' %}" class="btn">Sign In</a></li>
+                    <li><a href="{% url 'register' %}" class="btn">Sign Up</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <div class="login-section">
+        <h2 class="text-center mb-4">Register</h2>
+
+        <form method="post" oninput="validateForm()" onsubmit="showSuccessMessage()">
+            {% csrf_token %}
+            
+            <div class="mb-3">
+                {{ form.name.label_tag }} <!-- Render the label -->
+                {{ form.name }} <!-- Render the field directly -->
+            </div>
+            <div class="mb-3">
+                {{ form.email.label_tag }} <!-- Render the label -->
+                {{ form.email }} <!-- Render the field directly -->
+                <p id="emailError" class="error-message text-danger"></p>
+            </div>
+            <div class="mb-3">
+                {{ form.location.label_tag }} <!-- Render the label -->
+                {{ form.location }} <!-- Render the field directly -->
+            </div>
+            <div class="mb-3">
+                {{ form.mobile_number.label_tag }} <!-- Render the label -->
+                {{ form.mobile_number }} <!-- Render the field directly -->
+                <p id="mobileError" class="error-message text-danger"></p>
+            </div>
+            <div class="mb-3">
+                {{ form.password.label_tag }} <!-- Render the label -->
+                {{ form.password }} <!-- Render the field directly -->
+                <p id="passwordError" class="error-message text-danger"></p>
+            </div>
+        
+            <!-- Re-enter Password Field -->
+            <div class="mb-3">
+                {{ form.re_password.label_tag }} <!-- Render the label -->
+                {{ form.re_password }} <!-- Render the field directly -->
+                <p id="rePasswordError" class="error-message text-danger"></p>
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" id="registerBtn" class="btn btn-primary btn-lg" disabled>Create Account</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Footer Section -->
+<footer>
+    <p>&copy; 2024 Electric Vehicle Rental System. All rights reserved.</p>
+</footer>
+
+<!-- JavaScript for Form Validation -->
+<script>
+    function validateForm() {
+        const password = document.getElementById("id_password").value;
+        const rePassword = document.getElementById("id_re_password").value;
+        const email = document.getElementById("id_email").value;
+        const mobileNumber = document.getElementById("id_mobile_number").value;
+
+        const emailPattern = /^[^@]+@[^@]+\.[^@]+$/;
+        const mobilePattern = /^\d{10,15}$/;
+
+        let valid = true;
+
+        // Email Validation
+        if (!emailPattern.test(email)) {
+            document.getElementById("emailError").textContent = "Invalid email format.";
+            valid = false;
+        } else {
+            document.getElementById("emailError").textContent = "";
+        }
+
+        // Mobile Number Validation
+        if (!mobilePattern.test(mobileNumber)) {
+            document.getElementById("mobileError").textContent = "Invalid mobile number.";
+            valid = false;
+        } else {
+            document.getElementById("mobileError").textContent = "";
+        }
+
+        // Password Validation
+        if (password.length < 8 || 
+            !/[A-Z]/.test(password) || 
+            !/[a-z]/.test(password) || 
+            !/\d/.test(password) || 
+            !/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+            document.getElementById("passwordError").textContent = "Password must be at least 8 characters long, contain a mix of upper/lowercase letters, numbers, and special characters.";
+            valid = false;
+        } else {
+            document.getElementById("passwordError").textContent = "";
+        }
+
+        // Re-enter Password Validation
+        if (password !== rePassword) {
+            document.getElementById("rePasswordError").textContent = "Passwords do not match.";
+            valid = false;
+        } else {
+            document.getElementById("rePasswordError").textContent = "";
+        }
+
+        // Enable/Disable register button based on validation
+        document.getElementById("registerBtn").disabled = !valid;
+    }
+
+    function showSuccessMessage() {
+        alert("Registration successful!");
+        window.location.href = "/"; // Redirect to home page
+    }
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

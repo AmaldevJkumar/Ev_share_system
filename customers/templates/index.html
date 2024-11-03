@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Vehicle Hub</title>
+
+    <!-- Leaflet.js CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHq6C6zO14jkllMKqYlIet6e3zMdoMkW+JzF8Dn3eOa9T1HQ3g7r2hrR5jtStC7+I6jJ+kag==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% load static %}
+    <style>
+
+
+
+
+
+
+
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', sans-serif;
+        }
+        
+        /* Container for centering and spacing */
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+        }
+
+        /* Header */
+        header {
+            background-color: #1d3557;
+            color: #f1faee;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: #f1faee;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #a8dadc;
+        }
+
+        /* Customer Dashboard */
+        .customer {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .customer_main h2 {
+            margin: 0 0 10px;
+        }
+        .customer_main p {
+            margin: 5px 0;
+        }
+        .btn {
+            background-color: #007BFF;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        /* Sections */
+        section {
+            padding: 60px 20px;
+            text-align: center;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 20px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .card h5 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #1a73e8;
+        }
+        .card p {
+            font-size: 1rem;
+            color: #666;
+        }
+        .card a {
+            display: inline-block;
+            margin-top: 15px;
+            color: #fff;
+            background-color: #1a73e8;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease;
+        }
+        .card a:hover {
+            background-color: #0f5bc2;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 1em;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>Electric Vehicle Hub</h1>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#vehicles">Vehicles</a></li>
+                    <li><a href="#location">Location</a></li>
+                    <li><a href="{% url 'login_page' %}" class="btn">Sign In</a></li>
+                    <li><a href="{% url 'register' %}" class="btn">Sign Up</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Customer Dashboard -->
+    <section class="customer" id="home">
+        <div class="customer_main">
+            <h2>Welcome, {{ customer.name }}</h2>
+            <p>Location: {{ customer.location }}</p>
+            <p>Balance: ${{ customer.balance }}</p>
+            <p>Joined Date: {{ customer.joined_date }}</p>
+
+            <!-- Display Rented Vehicles -->
+            {% if rented_vehicles %}
+            <div class="rented-vehicles">
+                <h3>Your Rented Vehicles</h3>
+                <ul>
+                    {% for vehicle in rented_vehicles %}
+                        <li>
+                            <strong>Vehicle Model:</strong> {{ vehicle.vehicle_model }}<br>
+                            <strong>Rented Time:</strong> {{ vehicle.rented_time }}<br>
+                            <strong>Return Time:</strong> {% if vehicle.return_time %}{{ vehicle.return_time }}{% else %}Not returned{% endif %}<br>
+                            <strong>Amount Due:</strong> ${{ vehicle.amount_due }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% else %}
+                <p>You have not rented any vehicles yet.</p>
+            {% endif %}
+        </div>
+    </section>
+
+    <!-- Rent Section -->
+    <section class="rent" id="rent">
+        <div class="container">
+            <div class="card">
+                <h5 class="card-title">Rent</h5>
+                <p class="card-text">Easily rent a vehicle of your choice from our available options. Select your preferred model and duration.</p>
+                <a href="{% url 'rent_vehicle' %}" class="btn">Rent Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Return Section -->
+    <section class="return" id="return">
+        <div class="container">
+            <div class="card">
+                <h5 class="card-title">Return</h5>
+                <p class="card-text">Return your rented vehicle here. Make sure to follow the return process for a smooth experience.</p>
+                <a href="{% url 'return_vehicle' %}" class="btn">Return Vehicle</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Payment Section -->
+    <section class="payment" id="payment">
+        <div class="container">
+            <div class="card">
+                <h5 class="card-title">Pay</h5>
+                <p class="card-text">Complete your payment for rentals and any additional charges through our secure payment portal.</p>
+                <a href="{% url 'make_payment' %}" class="btn">Pay Now</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Report Section -->
+    <section class="report" id="report">
+        <div class="container">
+            <div class="card">
+                <h5 class="card-title">Report</h5>
+                <p class="card-text">Report any issues or feedback regarding your rental experience. We value your input!</p>
+                <a href="{% url 'report_issue' %}" class="btn">Report Issue</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Electric Vehicle Hub. All rights reserved.</p>
+    </footer>
+
+</body>
+</html>

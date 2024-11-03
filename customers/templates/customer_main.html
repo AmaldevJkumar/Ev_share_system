@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Main Page</title>
+</head>
+<body>
+
+    <!-- Customer Dashboard Section -->
+    <section class="customer" id="home">
+        <div class="customer_main">
+            <h2>Welcome, {{ customer.name|default:"Customer not found" }}</h2>
+            <p>Location: {{ customer.location|default:"No location" }}</p>
+            <p>Balance: ${{ customer.balance|default:"No balance" }}</p>
+            <p>Joined Date: {{ customer.joined_date|default:"No date" }}</p>
+
+            <!-- Display Rented Vehicles -->
+            {% if rented_vehicles %}
+                <h3>Your Rented Vehicles</h3>
+                <ul>
+                    {% for vehicle in rented_vehicles %}
+                        <li>
+                            <strong>Vehicle Model:</strong> {{ vehicle.vehicle_model }}<br>
+                            <strong>Rented Time:</strong> {{ vehicle.rented_time }}<br>
+                            <strong>Return Time:</strong> {% if vehicle.return_time %}{{ vehicle.return_time }}{% else %}Not returned{% endif %}<br>
+                            <strong>Amount Due:</strong> ${{ vehicle.amount_due }}
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>You have no rented vehicles.</p>
+            {% endif %}
+        </div>
+    </section>
+
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electric Vehicle Hub</title>
+
+    <!-- Leaflet.js CSS and JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHq6C6zO14jkllMKqYlIet6e3zMdoMkW+JzF8Dn3eOa9T1HQ3g7r2hrR5jtStC7+I6jJ+kag==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    {% load static %}
+
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f5f5;
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        /* Header */
+        header {
+            background-color: #1d3557;
+            color: #f1faee;
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        header .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            font-size: 2em;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+        }
+
+        nav ul li {
+            margin-left: 20px;
+        }
+
+        nav ul li a {
+            color: #f1faee;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover {
+            color: #a8dadc;
+        }
+
+        /* Hero Section */
+        .hero {
+            background: url("{% static 'images/bgi.png' %}") no-repeat center center/cover;
+            background-size: cover; 
+            height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            color: #fff;
+            text-align: center;
+        }
+
+        .hero::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(29, 53, 87, 0.8);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h2 {
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            color: #f1faee;
+        }
+
+        .hero p {
+            font-size: 1.2em;
+            margin-bottom: 30px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            color: #f1faee;
+        }
+
+        .hero .btn {
+            padding: 12px 35px;
+            background-color: #e63946;
+            color: #f1faee;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .hero .btn:hover {
+            background-color: #d62828;
+        }
+
+        /* Features Section */
+        .features {
+            padding: 60px 20px;
+            background-color: #f1faee;
+        }
+
+        .features .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .features h2 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            color: #457b9d;
+        }
+
+        .feature-list {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .feature {
+            background-color: #fff;
+            padding: 20px;
+            margin: 15px;
+            flex: 1 1 250px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature i {
+            font-size: 3em;
+            color: #457b9d;
+            margin-bottom: 15px;
+        }
+
+        .feature h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #1d3557;
+        }
+
+        .feature p {
+            font-size: 1em;
+            color: #666;
+        }
+
+        /* Vehicles Section */
+        .vehicles {
+            padding: 60px 20px;
+            background-color:#1d3557;
+        }
+
+        .vehicles .container {
+            width: 100vw; /* Use the full viewport width */
+            max-width: none; /* Remove any maximum width restriction */
+            margin: auto;
+            text-align: center;
+        }
+
+        .vehicles h2 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            color: #457b9d;
+        }
+
+        .vehicle-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .vehicle {
+            margin: 15px;
+            flex: 1 1 300px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            overflow: hidden;
+            transition: transform 0.3s ease;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .vehicle:hover {
+            transform: scale(1.05);
+        }
+
+        .vehicle img {
+            width: 100%;
+            height: 200px;
+            object-fit: contain;
+        }
+
+        .vehicle-info {
+            padding: 15px;
+        }
+
+        .vehicle-info h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #1d3557;
+        }
+
+        .vehicle-info p {
+            font-size: 1em;
+            color: #666;
+        }
+
+        /* Contact Section */
+        .contact {
+            padding: 60px 20px;
+            background-color: #1d3557;
+            color: #f1faee;
+        }
+
+        .contact .container {
+            width: 90%;
+            max-width: 800px;
+            margin: auto;
+            text-align: center;
+        }
+
+        .contact h2 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            color: #a8dadc;
+        }
+
+        .contact form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .contact input, 
+        .contact textarea {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .contact button {
+            padding: 12px 35px;
+            background-color: #e63946;
+            color: #f1faee;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.1em;
+            transition: background-color 0.3s ease;
+        }
+
+        .contact button:hover {
+            background-color: #d62828;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: #fff;
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        footer p {
+            margin: 0;
+            font-size: 1em;
+        }
+
+        .location-section {
+    padding: 60px 20px;
+    background-color: #f1faee;
+}
+
+.location-section .container {
+    width: 100vw; /* Use the full viewport width */
+    max-width: none; /* Remove any maximum width restriction */
+    margin: auto;
+}
+
+.location-section h2 {
+    text-align: center;
+    font-size: 2.5em;
+    color: #457b9d;
+    margin-bottom: 40px;
+}
+
+.location-content {
+    display: flex;
+    gap: 20px; /* Gap between map and info section */
+}
+
+/* Map Section */
+#map {
+    flex: 2 1 65%; /* Flex property to give more space to the map */
+    height: 400px; /* Fixed height for the map */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%; /* Make the map take full width of its container */
+}
+
+/* Info Section */
+.location-info {
+    flex: 1 1 30%; /* Flex property for the info section */
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.location-info h3 {
+    font-size: 1.8em;
+    margin-bottom: 15px;
+    color: #1d3557;
+}
+
+.location-info p {
+    font-size: 1em;
+    color: #666;
+    line-height: 1.6;
+    margin-bottom: 10px;
+}
+
+
+
+        /* Responsive Styles */
+        @media (max-width: 768px) {
+            nav ul {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            nav ul li {
+                margin: 10px 0;
+            }
+
+            .feature-list, .vehicle-gallery {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <header>
+        <div class="container">
+            <h1>Electric Vehicle Hub</h1>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#vehicles">Vehicles</a></li>
+                    <li><a href="#location">Location</a></li>
+                    <li><a href="{% url 'login_page' %}" class="btn">Sign In</a></li>
+                    <li><a href="{% url 'register' %}" class="btn">Sign Up</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h2>Drive the Future</h2>
+            <p>Discover the ultimate eco-friendly way to explore the city. Reserve, ride, and return an electric vehicle on demand.</p>
+            <a href="{% url 'register' %}" class="btn">Get Started</a>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="features">
+        <div class="container">
+            <h2>Features</h2>
+            <div class="feature-list">
+                <div class="feature">
+                    <i class="fas fa-battery-full"></i>
+                    <h3>Eco-Friendly</h3>
+                    <p>Our fleet of EVs reduces your carbon footprint.</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-clock"></i>
+                    <h3>24/7 Availability</h3>
+                    <p>Access vehicles anytime with our seamless system.</p>
+                </div>
+                <div class="feature">
+                    <i class="fas fa-mobile-alt"></i>
+                    <h3>Mobile Access</h3>
+                    <p>Manage bookings and payments on the go.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Vehicles Section -->
+    <section class="vehicles" id="vehicles">
+        <div class="container">
+            <h2>Our Fleet</h2>
+            <div class="vehicle-gallery">
+                <div class="vehicle">
+                    <img src="{% static 'images/bike2.png' %}" alt="Vehicle 1">
+                    <div class="vehicle-info">
+                        <h3>Electric Bike</h3>
+                        <p>Advanced electric car with autopilot features.</p>
+                    </div>
+                </div>
+                <div class="vehicle">
+                    <img src="{% static 'images/scooter1.png' %}" alt="Vehicle 2">
+                    <div class="vehicle-info">
+                        <h3>Electric Scooter</h3>
+                        <p>Compact and efficient with a sleek design.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <section class="location-section" id="location">
+        <div class="container">
+            <h2>Our Location</h2>
+            <div class="location-content">
+                <div id="map"></div>
+                <div class="location-info">
+                    <h3>Visit Us</h3>
+                    <p>Find us at Glasgow University’s electric vehicle hub, where you can easily access eco-friendly transportation options to explore the city.</p>
+                    <p>Address: 26H Winton Drive, Glasgow, Scotland</p>
+                    <p>Contact: +44 7553990655</p>
+                    <p>Email: info@evhub.com</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+
+    <!-- Contact Section -->
+    <section class="contact" id="contact">
+        <div class="container">
+            <h2>Contact Us</h2>
+            <form action="#">
+                <input type="text" placeholder="Your Name" required>
+                <input type="email" placeholder="Your Email" required>
+                <textarea placeholder="Your Message" rows="5" required></textarea>
+                <button type="submit">Send Message</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 Electric Vehicle Hub. All rights reserved.</p>
+    </footer>
+
+    <script>
+    
+        const map = L.map('map').setView([55.8721, -4.2892], 14); // University of Glasgow coordinates
+
+        
+        // Load Leaflet tile layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+        
+        // Fetch locations from the Django view
+        fetch('/get_locations/')
+            .then(response => response.json())
+            .then(locations => {
+                // Loop through the locations and create markers
+                locations.forEach(location => {
+                    const latLng = [location.latitude, location.longitude];
+                    
+                    // Create a custom div icon for the marker
+                    const customIcon = L.divIcon({
+                        className: 'custom-marker', // Custom class for styling
+                        html: `<div class="marker-label"></div>`, // No label in the marker
+                        iconSize: [100, 40], // Size of the icon
+                        iconAnchor: [50, 20] // Center the icon
+                    });
+                    
+                    // Add the marker to the map with a tooltip for hover
+                    L.marker(latLng, { icon: customIcon })
+                        .addTo(map)
+                        .bindTooltip(location.location_name, {
+                            permanent: true,  // Keep the tooltip always visible
+                            direction: 'top', // Position the tooltip above the marker
+                            className: 'tooltip-label', // Custom class for styling the tooltip
+                        });
+            });
+        })
+        .catch(error => console.error('Error fetching locations:', error));
+    </script>
+
+
+</body>
+</html>
